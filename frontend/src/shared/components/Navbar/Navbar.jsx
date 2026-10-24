@@ -61,6 +61,25 @@ export default function Navbar({ user = null, onLogout }) {
             </NavLink>
           ))}
 
+          {!user && showLogin && (
+            <>
+              <Link
+                to="/login"
+                className="navbar-link mobile-auth-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                to="/register"
+                className="navbar-link mobile-auth-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                Đăng ký
+              </Link>
+            </>
+          )}
+
           {showTicketLookup && (
             <Link
               to="/check-ticket"
@@ -88,9 +107,14 @@ export default function Navbar({ user = null, onLogout }) {
               </button>
             </>
           ) : showLogin ? (
-            <Link to="/login" className="login-link">
-              Đăng nhập
-            </Link>
+            <>
+              <Link to="/login" className="login-link">
+                Đăng nhập
+              </Link>
+              <Link to="/register" className="login-link">
+                Đăng ký
+              </Link>
+            </>
           ) : null}
 
           {showTicketLookup && (

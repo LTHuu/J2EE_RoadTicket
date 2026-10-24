@@ -111,7 +111,7 @@ export const roleConfig = {
     },
   },
 
-  SYSTEM_ADMIN: {
+  ADMIN: {
     layout: "admin",
     homePath: "/admin",
     navbar: {

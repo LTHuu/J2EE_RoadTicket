@@ -1,5 +1,108 @@
 # Website quản lý bán vé xe đường dài
 
+## Cài đặt và cấu hình môi trường
+
+### Yêu cầu
+
+- JDK 21
+- Maven
+- Node.js và npm
+- MySQL đang chạy; database mặc định là `road_ticket` trên `localhost:3306`
+
+### Tạo Google OAuth Client ID
+
+1. Mở [Google Cloud Console](https://console.cloud.google.com/) và chọn hoặc tạo
+   một project.
+2. Trong **Google Auth Platform**, cấu hình **Branding** và **Audience**. Khi ứng
+   dụng ở chế độ **Testing**, thêm Google account của team vào **Test users**.
+3. Vào **Clients** → **Create client** → chọn **Web application**.
+4. Trong **Authorized JavaScript origins**, thêm đúng origin frontend, ví dụ
+   `http://localhost:5173`. Nếu dùng `127.0.0.1` hoặc port khác, thêm origin đó
+   riêng. Chỉ nhập scheme + host + port, không thêm đường dẫn `/login`.
+5. Tạo client và lấy **Client ID**. Backend xác minh ID token bằng Client ID;
+   luồng này không cần client secret. Không bao giờ đưa client secret vào frontend.
+
+### Cấu hình frontend
+
+Sao chép `frontend/.env.example` thành `frontend/.env.local`, sau đó thay giá trị
+`VITE_GOOGLE_CLIENT_ID` bằng Client ID vừa tạo:
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080
+VITE_GOOGLE_CLIENT_ID=your-google-oauth-web-client-id
+```
+
+`VITE_GOOGLE_CLIENT_ID` là cấu hình công khai được đóng gói vào frontend; không
+đặt password hoặc client secret vào biến `VITE_*`. Vite tự đọc
+`frontend/.env.local`; khởi động lại Vite sau khi thay đổi file này.
+
+### Cấu hình backend và gửi email xác thực
+
+Tham khảo `backend/backend/.env.example` để biết các biến cần cấu hình. Spring
+Boot **không tự nạp file `.env`**; truyền các giá trị qua Environment Variables
+trong cấu hình chạy IDE hoặc terminal. Dùng cùng `GOOGLE_CLIENT_ID` với
+`VITE_GOOGLE_CLIENT_ID` và cấu hình SMTP:
+
+| Biến | Bắt buộc | Mục đích |
+| --- | --- | --- |
+| `GOOGLE_CLIENT_ID` | Có nếu dùng Google login | Google OAuth Web Client ID; phải giống `VITE_GOOGLE_CLIENT_ID`. |
+| `MAIL_USERNAME` | Có | Địa chỉ Gmail dùng gửi thư xác thực. |
+| `MAIL_PASSWORD` | Có | Google App Password của tài khoản gửi mail, không phải mật khẩu đăng nhập Gmail. |
+| `MAIL_HOST` | Không | SMTP host; mặc định `smtp.gmail.com`. |
+| `MAIL_PORT` | Không | SMTP port; mặc định `587` (STARTTLS). |
+| `APP_BACKEND_URL` | Không | URL backend tạo link xác thực; mặc định `http://localhost:8080`. Khi deploy, đặt URL public của backend. |
+| `DB_URL` | Không | JDBC URL; mặc định kết nối MySQL local database `road_ticket`. |
+| `DB_USERNAME` / `DB_PASSWORD` | Tùy DB | Tài khoản MySQL; username mặc định là `root`. |
+| `JWT_SECRET` | Có theo cấu hình hiện tại | Cấu hình secret cho JWT; dùng một giá trị riêng, mạnh và giữ ngoài Git. |
+
+Để tạo Gmail App Password, bật **2-Step Verification** cho Google account gửi
+mail rồi tạo **App Password** trong phần bảo mật tài khoản Google. App Password
+chỉ hiển thị một lần; giữ trong secret manager hoặc biến môi trường local, không
+commit lên Git. Nếu dùng nhà cung cấp SMTP khác, đặt `MAIL_HOST`, `MAIL_PORT`,
+`MAIL_USERNAME`, `MAIL_PASSWORD` theo thông tin nhà cung cấp đó.
+
+Có thể đặt biến trong **Run/Debug → Environment variables** của IDE. Ví dụ chạy
+backend local bằng PowerShell từ thư mục gốc repository (điền các giá trị local
+của bạn, không commit chúng):
+
+```powershell
+$env:GOOGLE_CLIENT_ID = "your-google-oauth-web-client-id"
+$env:MAIL_USERNAME = "your-sender@gmail.com"
+$env:MAIL_PASSWORD = "your-google-app-password"
+$env:APP_BACKEND_URL = "http://localhost:8080"
+$env:DB_USERNAME = "root"
+$env:DB_PASSWORD = "your-database-password"
+$env:JWT_SECRET = "replace-with-a-strong-random-secret"
+mvn -f backend\backend\pom.xml spring-boot:run
+```
+
+### Khởi chạy
+
+Ở terminal thứ nhất:
+
+```powershell
+npm --prefix frontend install
+npm --prefix frontend run dev
+```
+
+Ở terminal thứ hai, sau khi đã cấu hình environment variables:
+
+```powershell
+mvn -f backend\backend\pom.xml spring-boot:run
+```
+
+Mở origin frontend đã đăng ký với Google, thường là `http://localhost:5173`.
+Đăng ký bằng email/mật khẩu gửi link xác thực qua SMTP. Google login xác minh
+email bằng Google và không cần bước xác thực email riêng của ứng dụng.
+
+### Khởi tạo tài khoản admin (tùy chọn)
+
+Để tạo tài khoản admin lần đầu khi backend khởi động, cấu hình thêm
+`ADMIN_EMAIL`, `ADMIN_USERNAME` và `ADMIN_PASSWORD`. Username cần từ 4 đến 50 ký
+tự, mật khẩu từ 8 đến 72 ký tự. Mật khẩu được mã hóa BCrypt trước khi lưu. Nếu
+không cấu hình các biến này, bước khởi tạo admin sẽ được bỏ qua. Tài khoản đã
+tồn tại sẽ không bị cập nhật hoặc tự nâng quyền.
+
 Tài liệu này mô tả vai trò và quan hệ của 13 entity hiện có trong backend. Mã nguồn nằm tại [thư mục entity](backend/backend/src/main/java/backend/backend/entity).
 
 ## Vai trò từng entity

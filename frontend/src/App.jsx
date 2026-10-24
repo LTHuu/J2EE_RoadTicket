@@ -3,67 +3,45 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "./shared/components/Navbar/Navbar.jsx";
 import HomePage from "./pages/Home.jsx";
 import BusCompanyPage from "./features/company/pages/ListBusCompany.jsx";
-
-const testUsers = {
-  GUEST: {
-    role: "GUEST",
-    fullName: "Khách truy cập",
-  },
-  CUSTOMER: {
-    role: "CUSTOMER",
-    fullName: "Khách hàng Demo",
-  },
-  DRIVER: {
-    role: "DRIVER",
-    fullName: "Tài xế Demo",
-  },
-  CONDUCTOR: {
-    role: "CONDUCTOR",
-    fullName: "Lơ xe Demo",
-  },
-  COMPANY_ADMIN: {
-    role: "COMPANY_ADMIN",
-    fullName: "Quản lý nhà xe Demo",
-  },
-};
+import LoginPage from "./features/auth/pages/Login.jsx";
+import RegisterPage from "./features/auth/pages/Register.jsx";
+import {
+  getAuthSession,
+  logout as clearAuthSession,
+} from "./features/auth/api.js";
 
 export default function App() {
-  const [role, setRole] = useState("DRIVER");
-  const user = role === "GUEST" ? null : testUsers[role];
+  const [session, setSession] = useState(getAuthSession);
+  const user = session
+    ? {
+        role: session.role,
+        fullName: session.username || session.email,
+      }
+    : null;
+
+  function handleLogout() {
+    clearAuthSession();
+    setSession(null);
+  }
 
   return (
     <>
-      <Navbar
-        user={user}
-        onLogout={() => setRole("GUEST")}
-      />
+      <Navbar user={user} onLogout={handleLogout} />
 
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/bus-companies" element={<BusCompanyPage />} />
+          <Route
+            path="/login"
+            element={<LoginPage onAuthenticated={setSession} />}
+          />
+          <Route
+            path="/register"
+            element={<RegisterPage onAuthenticated={setSession} />}
+          />
         </Routes>
       </main>
-
-      {/* <main style={{ padding: 24 }}>
-        <h2>RoadTicket - Navbar Test</h2>
-
-        <label htmlFor="role">Chọn role để kiểm tra: </label>
-
-        <select
-          id="role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-        >
-          {Object.keys(testUsers).map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-
-        <p>Role hiện tại: {role}</p>
-      </main> */}
     </>
   );
 }

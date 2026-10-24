@@ -161,7 +161,8 @@
 }
 
 .mobile-menu-toggle,
-.mobile-ticket-button {
+.mobile-ticket-button,
+.mobile-auth-link {
   display: none;
 }
 
@@ -258,6 +259,10 @@
   .navbar-link {
     padding: 13px 8px;
     font-size: 14px;
+  }
+
+  .mobile-auth-link {
+    display: block;
   }
 
   .navbar-link::after {
