@@ -143,3 +143,15 @@ Các quy tắc giữa nhiều bản ghi cần thực hiện ở service:
 - Đơn hết hạn hoặc bị hủy cần giải phóng chỗ; cần giữ lịch sử vé và thanh toán.
 
 Entity chưa tự triển khai các quy tắc service này. Xem thêm [ghi chú mô hình dữ liệu](backend/backend/ENTITY_MODEL.md).
+
+## Frontend
+
+Frontend được xây dựng bằng React và Vite. Cần cài Node.js trước khi chạy.
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Tạo bản build production bằng `npm run build`; chạy thử bản build bằng `npm run preview`.

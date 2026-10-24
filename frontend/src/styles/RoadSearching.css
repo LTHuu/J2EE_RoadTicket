@@ -1,0 +1,242 @@
+
+.road-search {
+  width: 100%;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(24, 55, 90, 0.09);
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.road-search *,
+.road-search *::before,
+.road-search *::after {
+  box-sizing: border-box;
+}
+
+.road-search__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.road-search__fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+
+.road-search__field {
+  min-width: 0;
+}
+
+.road-search__label {
+  display: block;
+  margin-bottom: 9px;
+  color: #263449;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.road-search__input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.road-search__field-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  width: 20px;
+  height: 20px;
+  color: #1a7efb;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.road-search__input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 54px;
+  padding: 0 12px 0 45px;
+  border: 1px solid #dce3ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #253348;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.road-search__input::placeholder {
+  color: #98a3b3;
+}
+
+.road-search__input:focus {
+  border-color: #1a7efb;
+  box-shadow: 0 0 0 3px rgba(26, 126, 251, 0.12);
+}
+
+.road-search__swap {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 7px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dce8f8;
+  border-radius: 50%;
+  background: #f0f6ff;
+  color: #1a7efb;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.road-search__swap:hover {
+  background: #dfecff;
+  transform: rotate(180deg);
+}
+
+.road-search__swap svg {
+  width: 20px;
+  height: 20px;
+}
+
+.road-search__suggestions {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #e0e7f0;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(24, 55, 90, 0.14);
+}
+
+.road-search__suggestion {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #263449;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.road-search__suggestion:hover {
+  background: #f0f6ff;
+  color: #1a7efb;
+}
+
+.road-search__suggestion-icon {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  color: #1a7efb;
+}
+
+.road-search__suggestion-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.road-search__empty {
+  padding: 14px 10px;
+  color: #7b8797;
+  font-size: 13px;
+}
+
+.road-search__error {
+  margin: 0;
+  color: #dc3545;
+  font-size: 13px;
+}
+
+.road-search__submit {
+  display: flex;
+  width: 100%;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #1a7efb;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.road-search__submit:hover {
+  background: #0967db;
+}
+
+.road-search__submit:active {
+  transform: scale(0.99);
+}
+
+.road-search__submit svg {
+  width: 23px;
+  height: 23px;
+}
+
+@media (max-width: 900px) {
+  .road-search__fields {
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  }
+
+  .road-search__date {
+    grid-column: 1 / -1;
+  }
+
+  .road-search__swap {
+    align-self: end;
+  }
+}
+
+@media (max-width: 560px) {
+  .road-search {
+    padding: 18px;
+  }
+
+  .road-search__fields {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .road-search__swap {
+    align-self: center;
+    margin: -5px 0;
+    transform: rotate(90deg);
+  }
+
+  .road-search__swap:hover {
+    transform: rotate(270deg);
+  }
+
+  .road-search__date {
+    width: 100%;
+  }
+
+  .road-search__submit {
+    min-height: 50px;
+  }
+}
