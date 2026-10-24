@@ -10,6 +10,7 @@ Các entity dùng Jakarta Persistence và Lombok, theo cấu trúc có sẵn c�
 | Vehicle | Xe thuộc một nhà xe, có biển số duy nhất, loại xe và sức chứa. |
 | Seat | Ghế của xe; số ghế duy nhất trong cùng xe. |
 | Route | Tuyến đi, điểm đến, khoảng cách (km), thời gian dự kiến (phút). |
+| StopPoint | Điểm đón khách trên một tuyến, có tên, địa chỉ, thứ tự duy nhất trong tuyến và trạng thái hoạt động. |
 | TripInfo | Chuyến cụ thể trên một tuyến, sử dụng một xe; giờ đi, giờ đến và giá vé. |
 | TripStaff | Phân công thành viên nhà xe cho chuyến; một thành viên chỉ xuất hiện một lần trong cùng chuyến. |
 | Passenger | Thông tin hành khách, độc lập với tài khoản đặt vé. |

@@ -1,5 +1,6 @@
 package backend.backend;
 
+import backend.backend.entity.StopPoint;
 import backend.backend.entity.TripInfo;
 import backend.backend.entity.Vehicle;
 import jakarta.validation.Validation;
@@ -60,5 +61,24 @@ class EntityValidationTests {
         assertFalse(VALIDATOR.validateProperty(vehicle, "seatCapacity").isEmpty());
         vehicle.setSeatCapacity(40);
         assertTrue(VALIDATOR.validateProperty(vehicle, "seatCapacity").isEmpty());
+    }
+
+    @Test
+    void stopPointRequiresNameAddressAndPositiveSequenceNumber() {
+        StopPoint stopPoint = new StopPoint();
+        stopPoint.setName("Ben xe mien Dong");
+        stopPoint.setAddress("292 Dinh Bo Linh, Binh Thanh");
+        stopPoint.setSequenceNumber(1);
+
+        assertTrue(VALIDATOR.validate(stopPoint).isEmpty());
+
+        stopPoint.setName(" ");
+        assertFalse(VALIDATOR.validateProperty(stopPoint, "name").isEmpty());
+        stopPoint.setName("Ben xe mien Dong");
+        stopPoint.setAddress("");
+        assertFalse(VALIDATOR.validateProperty(stopPoint, "address").isEmpty());
+        stopPoint.setAddress("292 Dinh Bo Linh, Binh Thanh");
+        stopPoint.setSequenceNumber(0);
+        assertFalse(VALIDATOR.validateProperty(stopPoint, "sequenceNumber").isEmpty());
     }
 }

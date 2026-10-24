@@ -1,6 +1,6 @@
 # Website quản lý bán vé xe đường dài
 
-Tài liệu này mô tả vai trò và quan hệ của 12 entity hiện có trong backend. Mã nguồn nằm tại [thư mục entity](backend/backend/src/main/java/backend/backend/entity).
+Tài liệu này mô tả vai trò và quan hệ của 13 entity hiện có trong backend. Mã nguồn nằm tại [thư mục entity](backend/backend/src/main/java/backend/backend/entity).
 
 ## Vai trò từng entity
 
@@ -12,6 +12,7 @@ Tài liệu này mô tả vai trò và quan hệ của 12 entity hiện có tron
 | `Vehicle` | `vehicles` | Xe thuộc nhà xe, được sử dụng để chạy các chuyến. | Nhà xe, biển số, tên xe, loại xe, sức chứa, trạng thái hoạt động. |
 | `Seat` | `seats` | Một ghế hoặc giường cố định trên xe. | Xe, số ghế, tầng, trạng thái hoạt động. |
 | `Route` | `routes` | Tuyến đường giữa điểm đi và điểm đến, có thể được sử dụng cho nhiều chuyến. | Điểm đi, điểm đến, khoảng cách km, thời gian dự kiến phút. |
+| `StopPoint` | `stop_point` | Điểm đón khách dọc theo một tuyến, được sắp xếp theo thứ tự trên tuyến. | Tuyến, tên điểm dừng, địa chỉ, thứ tự, trạng thái hoạt động. |
 | `TripInfo` | `trips` | Một chuyến xe cụ thể có lịch khởi hành, xe sử dụng và giá vé. | Tuyến, xe, giờ đi, giờ đến, giá vé, trạng thái chuyến. |
 | `TripStaff` | `trip_staff` | Phân công một thành viên nhà xe tham gia một chuyến cụ thể. | Chuyến, thành viên `User_BusCom`, chức vụ trên chuyến. |
 | `Passenger` | `passengers` | Người thực tế đi xe, có thể khác người đặt vé. | Họ tên, điện thoại, email, số giấy tờ tùy thân. |
@@ -31,6 +32,7 @@ erDiagram
     Vehicle ||--o{ Seat : "co ghe"
     Vehicle ||--o{ TripInfo : "duoc su dung"
     Route ||--o{ TripInfo : "co chuyen"
+    Route ||--o{ StopPoint : "co diem don"
     TripInfo ||--o{ TripStaff : "co phan cong"
     User_BusCom ||--o{ TripStaff : "duoc phan cong"
     User o|--o{ Booking : "dat ve"
@@ -52,6 +54,7 @@ Mỗi quan hệ bên dưới được ánh xạ bằng `@ManyToOne(fetch = Fetch
 | `Vehicle` | `busCompany` | `company_id` | `BusCompany` | Một nhà xe sở hữu nhiều xe; mỗi xe thuộc một nhà xe. |
 | `Seat` | `vehicle` | `vehicle_id` | `Vehicle` | Một xe có nhiều ghế; mỗi ghế thuộc một xe. |
 | `TripInfo` | `route` | `route_id` | `Route` | Một tuyến có nhiều chuyến; mỗi chuyến chạy trên một tuyến. |
+| `StopPoint` | `route` | `route_id` | `Route` | Một tuyến có nhiều điểm đón; mỗi điểm dừng thuộc một tuyến. |
 | `TripInfo` | `vehicle` | `vehicle_id` | `Vehicle` | Một xe có thể chạy nhiều chuyến ở các thời điểm khác nhau. |
 | `TripStaff` | `trip` | `trip_id` | `TripInfo` | Một chuyến có nhiều phân công nhân viên. |
 | `TripStaff` | `staff` | `user_company_id` | `User_BusCom` | Một thành viên nhà xe có thể được phân công nhiều chuyến. |
@@ -79,6 +82,12 @@ Code hiện chỉ khai báo quan hệ một chiều. Ví dụ `Ticket` có thu�
 
 Nhà xe của một chuyến được xác định qua `TripInfo.vehicle.busCompany`. Hiện `Route` không gắn trực tiếp với nhà xe nên nhiều nhà xe có thể sử dụng cùng một tuyến.
 
+### Route và StopPoint
+
+`StopPoint` là một địa điểm đón khách dọc theo `Route`, không phải một chuyến xe cụ thể. Mỗi điểm dừng có tên, địa chỉ và `sequenceNumber` để xác định thứ tự đón trên tuyến; thứ tự này là duy nhất trong cùng một tuyến. `active` cho biết điểm đón còn được sử dụng hay không. Điểm dừng không lưu trong danh sách hai chiều ở `Route`; có thể truy vấn theo tuyến qua repository.
+
+`Ticket.pickupLocation` và `Ticket.dropoffLocation` hiện vẫn là chuỗi, chưa liên kết khóa ngoại tới `StopPoint`. Service cần kiểm tra điểm đón/trả hợp lệ khi tạo vé nếu muốn giới hạn lựa chọn theo các điểm dừng của tuyến.
+
 ### User và Passenger
 
 `User` là tài khoản đăng nhập; `Passenger` là người đi xe. Một khách hàng có thể dùng tài khoản của mình để đặt vé cho người thân. Hiện Passenger không có khóa ngoại liên kết trực tiếp với User.
@@ -102,7 +111,7 @@ Muốn xác định ghế còn trống phải kiểm tra Ticket theo cả chuy�
 ## Ví dụ luồng đặt vé
 
 1. Nhà xe tạo Vehicle và các Seat của xe.
-2. Tạo Route và TripInfo, chọn tuyến, xe, giờ đi, giờ đến và giá vé.
+2. Tạo Route và các StopPoint theo thứ tự dọc tuyến, sau đó tạo TripInfo với tuyến, xe, giờ đi, giờ đến và giá vé.
 3. Phân công tài xế, phụ xe bằng TripStaff, tham chiếu các thành viên User_BusCom.
 4. Khách chọn chuyến và ghế. Hệ thống tạo Booking với thông tin liên hệ.
 5. Tạo hoặc sử dụng Passenger cho từng người đi, rồi tạo Ticket liên kết đơn, chuyến, ghế và hành khách.
