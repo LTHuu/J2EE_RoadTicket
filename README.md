@@ -40,8 +40,8 @@ VITE_GOOGLE_CLIENT_ID=your-google-oauth-web-client-id
 
 Tham khảo `backend/backend/.env.example` để biết các biến cần cấu hình. Spring
 Boot **không tự nạp file `.env`**; truyền các giá trị qua Environment Variables
-trong cấu hình chạy IDE hoặc terminal. Dùng cùng `GOOGLE_CLIENT_ID` với
-`VITE_GOOGLE_CLIENT_ID` và cấu hình SMTP:
+trong cấu hình chạy IDE hoặc terminal, hoặc dùng profile local như hướng dẫn
+bên dưới. Dùng cùng `GOOGLE_CLIENT_ID` với `VITE_GOOGLE_CLIENT_ID` và cấu hình SMTP:
 
 | Biến | Bắt buộc | Mục đích |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ trong cấu hình chạy IDE hoặc terminal. Dùng cùng `GOOGLE_CLIENT_ID` v�
 | `APP_BACKEND_URL` | Không | URL backend tạo link xác thực; mặc định `http://localhost:8080`. Khi deploy, đặt URL public của backend. |
 | `DB_URL` | Không | JDBC URL; mặc định kết nối MySQL local database `road_ticket`. |
 | `DB_USERNAME` / `DB_PASSWORD` | Tùy DB | Tài khoản MySQL; username mặc định là `root`. |
-| `JWT_SECRET` | Có theo cấu hình hiện tại | Cấu hình secret cho JWT; dùng một giá trị riêng, mạnh và giữ ngoài Git. |
+| `JWT_SECRET` | Có nếu không dùng local profile | Cấu hình secret cho JWT; dùng một giá trị riêng, mạnh và giữ ngoài Git. Có thể đặt trong `application-local.properties` khi chạy profile local. |
 
 Để tạo Gmail App Password, bật **2-Step Verification** cho Google account gửi
 mail rồi tạo **App Password** trong phần bảo mật tài khoản Google. App Password
@@ -61,20 +61,30 @@ chỉ hiển thị một lần; giữ trong secret manager hoặc biến môi tr
 commit lên Git. Nếu dùng nhà cung cấp SMTP khác, đặt `MAIL_HOST`, `MAIL_PORT`,
 `MAIL_USERNAME`, `MAIL_PASSWORD` theo thông tin nhà cung cấp đó.
 
-Có thể đặt biến trong **Run/Debug → Environment variables** của IDE. Ví dụ chạy
-backend local bằng PowerShell từ thư mục gốc repository (điền các giá trị local
-của bạn, không commit chúng):
+#### Lưu cấu hình riêng trong application-local.properties
+
+Để giữ các giá trị local khi cập nhật `application.properties`, sao chép
+`backend/backend/src/main/resources/application-local.properties.example` thành
+`backend/backend/src/main/resources/application-local.properties`, rồi điền
+thông tin DB, Gmail App Password, admin và Google Client ID của riêng bạn.
+`application-local.properties` được Git bỏ qua; chỉ commit file `.example`,
+không commit file local.
+
+Kích hoạt profile `local` trong cấu hình Run/Debug của IDE, hoặc chạy từ thư mục
+gốc repository bằng PowerShell (vẫn cần cấu hình `JWT_SECRET` nếu chưa đặt trong
+file local):
 
 ```powershell
-$env:GOOGLE_CLIENT_ID = "your-google-oauth-web-client-id"
-$env:MAIL_USERNAME = "your-sender@gmail.com"
-$env:MAIL_PASSWORD = "your-google-app-password"
-$env:APP_BACKEND_URL = "http://localhost:8080"
-$env:DB_USERNAME = "root"
-$env:DB_PASSWORD = "your-database-password"
-$env:JWT_SECRET = "replace-with-a-strong-random-secret"
-mvn -f backend\backend\pom.xml spring-boot:run
+mvn -f backend\backend\pom.xml spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
+
+`application-local.properties` ghi đè các giá trị tương ứng trong
+`application.properties` khi profile được bật. Các biến môi trường vẫn có thể
+dùng; Spring ưu tiên biến môi trường hơn file cấu hình. Nếu không muốn dùng file
+local, cấu hình các biến môi trường trong **Run/Debug → Environment variables**
+của IDE thay thế. Với `APP_BACKEND_URL`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
+`JWT_SECRET` hoặc `CORS_ALLOWED_ORIGINS`, tiếp tục dùng environment variables
+theo bảng trên khi cần giá trị riêng.
 
 ### Khởi chạy
 
@@ -85,7 +95,8 @@ npm --prefix frontend install
 npm --prefix frontend run dev
 ```
 
-Ở terminal thứ hai, sau khi đã cấu hình environment variables:
+Ở terminal thứ hai, sau khi đã cấu hình environment variables cần thiết hoặc
+kích hoạt profile `local`:
 
 ```powershell
 mvn -f backend\backend\pom.xml spring-boot:run

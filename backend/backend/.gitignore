@@ -34,3 +34,4 @@ build/
 
 # Local credentials and environment variables
 .env
+/src/main/resources/application-local.properties
