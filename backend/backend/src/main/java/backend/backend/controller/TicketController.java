@@ -4,6 +4,7 @@ import backend.backend.service.TicketService;
 import jakarta.validation.Valid;
 import backend.backend.dto.ticket.TicketResponse;
 import backend.backend.dto.ticket.TicketRequest;
+import backend.backend.dto.ticket.UpdateTicketStatusRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,18 @@ public class TicketController {
     @PutMapping("/{id}")
     public ResponseEntity<TicketResponse> updateTicket(@PathVariable Long id, @Valid @RequestBody TicketRequest request) {
         TicketResponse ticketResponse = ticketService.updateTicket(id, request);
+        return ResponseEntity.ok(ticketResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+        ticketService.deleteTicket(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping ("/{id}/status")
+    public ResponseEntity<TicketResponse> updateTicketStatus(@PathVariable Long id, @Valid @RequestBody UpdateTicketStatusRequest request) {
+        TicketResponse ticketResponse = ticketService.updateTicketStatus(id, request.getStatus());
         return ResponseEntity.ok(ticketResponse);
     }
 }

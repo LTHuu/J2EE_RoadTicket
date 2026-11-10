@@ -5,6 +5,7 @@ import backend.backend.repository.TicketRepository;
 import backend.backend.entity.Ticket;
 import backend.backend.mapper.TicketMapper;
 import backend.backend.dto.ticket.TicketRequest;
+import backend.backend.enums.TicketStatus;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,27 @@ public class TicketService {
         // existingTicket.setSeat(null);
         // existingTicket.setTrip(null);
 
+        return ticketMapper.toResponse(existingTicket);
+    }
+
+    @Transactional
+    public void deleteTicket(Long id) {
+        Ticket existingTicket = ticketRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy vé với id: " + id));
+        ticketRepository.delete(existingTicket);
+    }
+
+    @Transactional
+    public TicketResponse updateTicketStatus(Long id, String status) {
+        Ticket existingTicket = ticketRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy vé với id: " + id));
+
+        TicketStatus newStatus;
+        try {
+            newStatus = TicketStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Trạng thái vé không hợp lệ: " + status);
+        }
+
+        existingTicket.setStatus(newStatus);
         return ticketMapper.toResponse(existingTicket);
     }
 
