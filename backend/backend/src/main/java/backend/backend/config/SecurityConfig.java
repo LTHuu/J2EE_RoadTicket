@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/auth/verify-email")
                         .permitAll()
+                        .requestMatchers("/api/users/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(
