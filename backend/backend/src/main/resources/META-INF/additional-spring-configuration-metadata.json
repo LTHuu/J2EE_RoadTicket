@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "app.admin.email",
+      "type": "java.lang.String",
+      "description": "Email of the initial administrator account."
+    },
+    {
+      "name": "app.admin.username",
+      "type": "java.lang.String",
+      "description": "Username of the initial administrator account."
+    },
+    {
+      "name": "app.admin.password",
+      "type": "java.lang.String",
+      "description": "Password of the initial administrator account."
+    },
+    {
+      "name": "app.google.client-id",
+      "type": "java.lang.String",
+      "description": "Google OAuth client ID used to verify Google ID tokens."
+    },
+    {
+      "name": "app.backend-url",
+      "type": "java.lang.String",
+      "description": "Public backend URL used in generated links."
+    }
+  ]
+}

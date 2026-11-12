@@ -1,6 +1,5 @@
 package backend.backend.config;
 
-import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
