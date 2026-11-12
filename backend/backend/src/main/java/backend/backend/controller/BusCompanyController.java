@@ -1,47 +1,46 @@
 package backend.backend.controller;
 
-import backend.backend.entity.BusCompany;
+import backend.backend.dto.buscompany.BusCompanyCreateDTO;
+import backend.backend.dto.buscompany.BusCompanyDTO;
+import backend.backend.dto.buscompany.BusCompanyUpdateDTO;
 import backend.backend.service.BusCompanyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/bus-companies")
 @CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class BusCompanyController {
 
-    @Autowired
-    private BusCompanyService busCompanyService;
+    private final BusCompanyService busCompanyService;
 
     @GetMapping
-    public List<BusCompany> getAllBusCompanies() {
-
-        return busCompanyService.getAllBusCompanies();
+    public ResponseEntity<List<BusCompanyDTO>> getAllBusCompanies() {
+        return ResponseEntity.ok(busCompanyService.getAllBusCompanies());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BusCompany> getBusCompanyById(@PathVariable Long id) {
-        return busCompanyService.getBusCompanyById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<BusCompanyDTO> getBusCompanyById(@PathVariable Long id) {
+        return ResponseEntity.ok(busCompanyService.getBusCompanyById(id));
     }
 
     @PostMapping
-    public BusCompany createBusCompany(@RequestBody BusCompany busCompany) {
-        return busCompanyService.createBusCompany(busCompany);
+    public ResponseEntity<BusCompanyDTO> createBusCompany(@Valid @RequestBody BusCompanyCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(busCompanyService.createBusCompany(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BusCompany> updateBusCompany(@PathVariable Long id, @RequestBody BusCompany companyDetails) {
-        try {
-            BusCompany updated = busCompanyService.updateBusCompany(id, companyDetails);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<BusCompanyDTO> updateBusCompany(
+            @PathVariable Long id,
+            @Valid @RequestBody BusCompanyUpdateDTO dto) {
+        return ResponseEntity.ok(busCompanyService.updateBusCompany(id, dto));
     }
 
     @DeleteMapping("/{id}")

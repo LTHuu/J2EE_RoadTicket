@@ -1,48 +1,58 @@
 package backend.backend.service;
 
+import backend.backend.dto.buscompany.BusCompanyCreateDTO;
+import backend.backend.dto.buscompany.BusCompanyDTO;
+import backend.backend.dto.buscompany.BusCompanyUpdateDTO;
 import backend.backend.entity.BusCompany;
+import backend.backend.mapper.BusCompanyMapper;
 import backend.backend.repository.BusCompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class BusCompanyService {
 
-    @Autowired
-    private BusCompanyRepository busCompanyRepository;
+    private final BusCompanyRepository busCompanyRepository;
+    private final BusCompanyMapper busCompanyMapper;
 
-    public List<BusCompany> getAllBusCompanies() {
-        return busCompanyRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<BusCompanyDTO> getAllBusCompanies() {
+        return busCompanyRepository.findAll()
+                .stream()
+                .map(busCompanyMapper::toDTO)
+                .toList();
     }
 
-    public Optional<BusCompany> getBusCompanyById(Long id) {
-        return busCompanyRepository.findById(id);
+    @Transactional(readOnly = true)
+    public BusCompanyDTO getBusCompanyById(Long id) {
+        return busCompanyMapper.toDTO(findBusCompany(id));
     }
 
-    public BusCompany createBusCompany(BusCompany busCompany) {
-        return busCompanyRepository.save(busCompany);
+    public BusCompanyDTO createBusCompany(BusCompanyCreateDTO dto) {
+        BusCompany busCompany = busCompanyMapper.toEntity(dto);
+        return busCompanyMapper.toDTO(busCompanyRepository.save(busCompany));
     }
 
-    public BusCompany updateBusCompany(Long id, BusCompany companyDetails) {
-        BusCompany company = busCompanyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhà xe với ID: " + id));
-        
-        company.setName(companyDetails.getName());
-        company.setDescription(companyDetails.getDescription());
-        company.setCode(companyDetails.getCode());
-        company.setHotline(companyDetails.getHotline());
-        company.setEmail(companyDetails.getEmail());
-        company.setAddress(companyDetails.getAddress());
-        company.setLogoUrl(companyDetails.getLogoUrl());
-        company.setStatus(companyDetails.getStatus());
-
-        return busCompanyRepository.save(company);
+    public BusCompanyDTO updateBusCompany(Long id, BusCompanyUpdateDTO dto) {
+        BusCompany busCompany = findBusCompany(id);
+        busCompanyMapper.updateEntity(dto, busCompany);
+        return busCompanyMapper.toDTO(busCompanyRepository.save(busCompany));
     }
 
     public void deleteBusCompany(Long id) {
-        busCompanyRepository.deleteById(id);
+        busCompanyRepository.delete(findBusCompany(id));
+    }
+
+    private BusCompany findBusCompany(Long id) {
+        return busCompanyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Không tìm thấy nhà xe với ID: " + id));
     }
 }

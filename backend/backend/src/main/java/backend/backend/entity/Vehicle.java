@@ -32,7 +32,7 @@ public class Vehicle {
     @NotNull
     @Positive
     @Column(nullable = false)
-    private Integer seatCapacity;
+    private int seatCapacity;
 
     @Column(nullable = false)
     private Boolean active = true;
