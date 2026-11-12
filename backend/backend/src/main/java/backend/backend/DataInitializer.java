@@ -3,6 +3,7 @@ package backend.backend;
 import backend.backend.entity.User;
 import backend.backend.enums.AuthProvider;
 import backend.backend.enums.UserRole;
+import backend.backend.mapper.UserMapper;
 import backend.backend.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,18 +23,21 @@ public class DataInitializer implements CommandLineRunner {
     private final String adminEmail;
     private final String adminUsername;
     private final String adminPassword;
+    private final UserMapper userMapper;
 
     public DataInitializer(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             @Value("${app.admin.email:}") String adminEmail,
             @Value("${app.admin.username:}") String adminUsername,
-            @Value("${app.admin.password:}") String adminPassword) {
+            @Value("${app.admin.password:}") String adminPassword,
+            UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminEmail = adminEmail;
         this.adminUsername = adminUsername;
         this.adminPassword = adminPassword;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -67,9 +71,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Configured admin username is already in use.");
         }
 
-        User admin = new User();
-        admin.setEmail(normalizedEmail);
-        admin.setUsername(username);
+        User admin = userMapper.toAdminEntity(normalizedEmail, username);
         admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setRole(UserRole.ADMIN);
         admin.setProvider(AuthProvider.LOCAL);

@@ -5,6 +5,7 @@ import backend.backend.config.GoogleIdTokenVerifier;
 import backend.backend.entity.User;
 import backend.backend.enums.AuthProvider;
 import backend.backend.enums.UserRole;
+import backend.backend.mapper.UserMapper;
 import backend.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class GoogleAuthService {
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     @Value("${app.google.client-id:}")
     private String googleClientId;
@@ -75,20 +77,15 @@ public class GoogleAuthService {
                 })
                 .orElseGet(() -> createGoogleUser(normalizedEmail, subject));
 
-        return new LoginResponse(
+        return userMapper.toLoginResponse(
+                user,
                 jwtService.generateToken(user),
                 "Bearer",
-                JwtService.ACCESS_TOKEN_TTL_SECONDS,
-                user.getId(),
-                user.getEmail(),
-                user.getUsername(),
-                user.getRole().name());
+                JwtService.ACCESS_TOKEN_TTL_SECONDS);
     }
 
     private User createGoogleUser(String email, String subject) {
-        User user = new User();
-        user.setEmail(email);
-        user.setUsername(createUsername(subject));
+        User user = userMapper.toGoogleEntity(email, createUsername(subject));
         user.setRole(UserRole.CUSTOMER);
         user.setProvider(AuthProvider.GOOGLE);
         user.setEmailVerified(true);

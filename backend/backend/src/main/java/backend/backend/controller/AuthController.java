@@ -9,6 +9,7 @@ import backend.backend.service.AuthService;
 import backend.backend.service.EmailVerificationService;
 import backend.backend.service.GoogleAuthService;
 import backend.backend.dto.GoogleRegisterDTO;
+import backend.backend.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final GoogleAuthService googleAuthService;
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(
@@ -74,11 +76,7 @@ public class AuthController {
     public CurrentUserResponse currentUser(
             @AuthenticationPrincipal Jwt jwt) {
 
-        return new CurrentUserResponse(
-                jwt.getClaim("userId"),
-                jwt.getSubject(),
-                jwt.getClaim("username"),
-                jwt.getClaim("role"));
+        return userMapper.toCurrentUserResponse(jwt);
     }
 
 }

@@ -7,6 +7,7 @@ import backend.backend.dto.auth.RegisterRequest;
 import backend.backend.entity.User;
 import backend.backend.enums.AuthProvider;
 import backend.backend.enums.UserRole;
+import backend.backend.mapper.UserMapper;
 import backend.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class AuthService {
     private final EmailVerificationService emailVerificationService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     @Transactional
     public void register(RegisterRequest request) {
@@ -50,7 +52,7 @@ public class AuthService {
                     "Username này đã được sử dụng");
         }
 
-        User user = new User();
+        User user = userMapper.toEntity(request);
         user.setEmail(email);
         user.setUsername(username);
         user.setPassword(
@@ -91,14 +93,11 @@ public class AuthService {
 
         String accessToken = jwtService.generateToken(user);
 
-        return new LoginResponse(
+        return userMapper.toLoginResponse(
+                user,
                 accessToken,
                 "Bearer",
-                JwtService.ACCESS_TOKEN_TTL_SECONDS,
-                user.getId(),
-                user.getEmail(),
-                user.getUsername(),
-                user.getRole().name());
+                JwtService.ACCESS_TOKEN_TTL_SECONDS);
     }
 
 }
