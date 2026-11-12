@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 "/api/auth/verify-email")
                         .permitAll()
                         .requestMatchers("/api/users/**").permitAll()
+                        // Thêm quyền cho phép truy cập tất cả các API bus-companies (cả GET, POST, PUT, DELETE)
+                        .requestMatchers("/api/bus-companies/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(
