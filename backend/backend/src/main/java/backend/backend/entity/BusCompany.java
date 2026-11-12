@@ -1,11 +1,6 @@
 package backend.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BusCompany {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,12 +17,17 @@ public class BusCompany {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column
-    private String ComEmail;
-
-    @Column
-    private String ComPhone;
-
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    //  Profile nhà xe
+    private String code;
+    private String hotline;
+    private String email;
+    
+    @Column(columnDefinition = "TEXT")
+    private String address;
+    
+    private String logoUrl;
+    private String status; 
 }
