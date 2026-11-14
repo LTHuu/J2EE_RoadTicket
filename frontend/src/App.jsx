@@ -5,6 +5,7 @@ import HomePage from "./pages/Home.jsx";
 import BusCompanyPage from "./features/company/pages/ListBusCompany.jsx";
 import LoginPage from "./features/auth/pages/Login.jsx";
 import RegisterPage from "./features/auth/pages/Register.jsx";
+import TicketList from "./features/tickets/pages/TicketList.jsx";
 import {
   getAuthSession,
   logout as clearAuthSession,
@@ -32,6 +33,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/bus-companies" element={<BusCompanyPage />} />
+          <Route path="/admin/tickets" element={<TicketList />} />
           <Route
             path="/login"
             element={<LoginPage onAuthenticated={setSession} />}
