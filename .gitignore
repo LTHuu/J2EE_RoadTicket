@@ -1,4 +1,4 @@
 .vscode/
 .env
-backend/backend/src/main/resources/application.properties
-backend/backend/src/main/resources/application-local.properties
+/backend/backend/src/main/resources/application.properties
+/backend/backend/src/main/resources/application-local.properties
